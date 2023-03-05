@@ -7,7 +7,6 @@ Use [Project on Covid];
 select * 
 from [Project on Covid]..covid_vaccinations_dataset
 
-get the net of population after death??
 
 /* from exploring the dataset on Covid death, I observed that
  in the location field there are instances of continents and world as 
@@ -19,7 +18,6 @@ population, (population-total_deaths) as post_pop
 from [Project on Covid]..Covid_death_dataset
 order by 1,3
 
---% of death to total cases
 
 --% of death to total cases
 Select location, month(date) as month,total_cases, total_deaths,
@@ -44,6 +42,7 @@ where continent is not null and location = 'Nigeria'
 order by 1,3
 
 --Countries with the highest cases compared to population
+
 Select location,Max(total_cases) as max_Total, population,
 Max((total_cases/population))*100 as case_per_population
 from [Project on Covid]..Covid_death_dataset
@@ -52,6 +51,7 @@ Group by location, population
 order by 4 desc
 
 --Countries with the highest mortality count
+
 with mortality_count as
 
  (Select location,Max(cast (total_deaths as int)) as max_Total
@@ -87,8 +87,6 @@ group by monthly
 order by 2,3
 
 
-
-
 ---- what % of the population has been vaccinated
 /* To achieve this I will combine the Covid_vaccination table with the Covid death table therough a Join*/
 select det.continent as continent, vac.location as location, (max(people_fully_vaccinated)/max(population))*100 as pop_vaccinated
@@ -100,7 +98,7 @@ where det.continent is not null
 Group by vac.location, det.continent  
 order by 3 desc
 
----
+---Cummulative total of people vaccinated by date and location
 select det.continent, det.location, det.date,vac.new_vaccinations,
 SUM(convert(int,vac.new_vaccinations)) over (partition by det.location order by vac.location, det.date) as run_pop_vac
 from [Project on Covid]..Covid_death_dataset det
@@ -109,12 +107,3 @@ on det.location = vac.location
 and det.date = vac.date
 where det.continent is not null and vac.new_vaccinations is not null
 order by 2,3 desc
-
-
-
-
-
-
-
-
-
